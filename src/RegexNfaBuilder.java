@@ -1,71 +1,67 @@
 public class RegexNfaBuilder {
-    private static RegexNfa FromRegexString(String regex, SpecializedState root) {
 
-        RegexNfa nfa = new RegexNfa(root, root);
+    private final String regex;
+    private RegexNfa nfa;
 
-        char[] regArray = regex.toCharArray();
-        for (int i = 0; i < regArray.length; i++) {
+    public RegexNfaBuilder(String regex) {
+        this.regex = regex;
+    }
 
-            if (regArray[i] == 'a') {
-                if (nfa.Final.TransitionA != null) {
-                    nfa.Final = nfa.Final.TransitionA;
-                } else {
-                    SpecializedState next = new SpecializedState(null, null);
-                    nfa.Final.TransitionA = next;
-                    nfa.Final = next;
-                }
+    private void handleA() {
+        if (nfa.Final.TransitionA != null) {
+            nfa.Final = nfa.Final.TransitionA;
+        } else {
+            SpecializedState next = new SpecializedState(null, null);
+            nfa.Final.TransitionA = next;
+            nfa.Final = next;
+        }
+    }
 
-            } else if (regArray[i] == 'b') {
-                if (nfa.Final.TransitionB != null) {
-                    nfa.Final = nfa.Final.TransitionB;
-                } else {
-                    SpecializedState next = new SpecializedState(null, null);
-                    nfa.Final.TransitionB = next;
-                    nfa.Final = next;
-                }
+    private void handleB() {
+        if (nfa.Final.TransitionB != null) {
+            nfa.Final = nfa.Final.TransitionB;
+        } else {
+            SpecializedState next = new SpecializedState(null, null);
+            nfa.Final.TransitionB = next;
+            nfa.Final = next;
+        }
+    }
 
-            } else if (regArray[i] == '|') {
-                if (regArray.length == i + 1) {
-                    throw new IllegalArgumentException("Regex must not have | as the last character.");
-                }
+    private void handleUnion(int position) {
+        if (regex.length() == position + 1) {
+            throw new IllegalArgumentException("Regex must not have | as the last character.");
+        }
 
-                String rightRegexOperand = ParserHelper.StringBeforeSameLevelUnion(regex, i);
-                RegexNfa rightNFA = FromRegexString(rightRegexOperand, nfa.Start);
+        String rightRegexOperand = ParserHelper.StringBeforeSameLevelUnion(regex, position);
+        RegexNfa rightNFA = build(rightRegexOperand, nfa.Start);
 
-                rightNFA.Final.EpsilonTransitions.add(nfa.Final);
-            } else if (regArray[i] == '(') {
+        rightNFA.Final.EpsilonTransitions.add(nfa.Final);
+    }
 
-            } else if (regArray[i] == '*') {
+    private RegexNfa build(String regex, SpecializedState root) {
+        nfa = new RegexNfa(root, root);
+
+        for (int i = 0; i < regex.length(); i++) {
+            switch (regex.charAt(i)) {
+                case 'a':
+                    handleA();
+                    break;
+                case 'b':
+                    handleB();
+                    break;
+                case '|':
+                    handleUnion(i);
+                    break;
 
             }
-//                // We only consider an opening parentheses because we only retrieve the string inside
-//                // the parentheses. We then jump to the point after the closing parentheses.
-//                case '(':
-//                    String inner = ParserHelper.StringInsideParentheses(regex, i);
-//
-//                    // This builds a new NFA from everything inside the parentheses. The starting state
-//                    // of the new NFA is the Final state of the original NFA. We will keep the inner NFA
-//                    // in case the next character is a union (|) or repetition (*) character.
-//                    leftNFA = FromRegexString(inner, nfa.Final);
-//
-//                    // Here we merge the two NFAs.
-//                    nfa.Final = leftNFA.Final;
-//
-//                    // Now we must move the index to the end of the closing parenthesis because we recursively
-//                    // read it. We move 1 + inner.length, ending up at the closing parentheses. The for loop will
-//                    // move us past it.
-//                    i += 1 + inner.length();
-//
-//                    break;
         }
 
         return nfa;
     }
 
-    public static RegexNfa FromRegexString(String regex) {
-
+    public RegexNfa Build(String regex) {
         // Our starting nfa contains one state that has no transitions and is the start and final state.
         SpecializedState start = new SpecializedState(null, null);
-        return FromRegexString(regex, start);
+        return build(regex, start);
     }
 }
