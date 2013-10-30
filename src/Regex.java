@@ -36,6 +36,14 @@ public class Regex {
     }
 
     public static RegexNfa Regex(String regex) {
+
+        String left = ParserHelper.StringBeforeSameLevelUnion(regex);
+        if (left.length() != regex.length()) {
+            return Union(Regex(left), Regex(regex.substring(regex.length() - 1)));
+        }
+
+
+        // TODO: must never return null
         return null;
     }
 }
