@@ -5,9 +5,7 @@ public class State {
     public State TransitionB;
     public ArrayList<State> EpsilonTransitions;
 
-    public State(State transitionA, State transitionB) {
-        TransitionA = transitionA;
-        TransitionB = transitionB;
+    public State() {
         EpsilonTransitions = new ArrayList<State>();
     }
 

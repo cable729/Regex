@@ -1,16 +1,11 @@
 
 public class ParserHelper {
-    public static String StringInsideParentheses(String input, int leftParen) {
-        if (input.charAt(leftParen) != '(') {
-            throw new IllegalArgumentException("There must be a left parentheses at input[leftParen].");
-        }
+    public static String MatchParentheses(String input) {
+        for (int i = 0, parenthesesCount = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '(') parenthesesCount++;
+            if (input.charAt(i) == ')') parenthesesCount--;
 
-        int parenCount = 1;
-        for (int i = leftParen; i < input.length(); i++) {
-            if (input.charAt(i) == '(') parenCount++;
-            if (input.charAt(i) == ')') parenCount--;
-
-            if (parenCount == 0) return input.substring(leftParen + 1, i - 1);
+            if (parenthesesCount == 0) return input.substring(0, i);
         }
 
         // No matching parentheses.
