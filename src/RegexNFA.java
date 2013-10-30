@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 
 public class RegexNfa {
-    public SpecializedState Start;
-    public SpecializedState Final;
+    public State Start;
+    public State Final;
 
-    public RegexNfa(SpecializedState start, SpecializedState finalState) {
+    public RegexNfa(State start, State finalState) {
         Start = start;
         Final = finalState;
     }
@@ -14,16 +14,16 @@ public class RegexNfa {
         // Handle empty string (e).
         if (input.equals("e")) return Start == Final;
 
-        ArrayList<SpecializedState> currentStates = new ArrayList<SpecializedState>();
+        ArrayList<State> currentStates = new ArrayList<State>();
         currentStates.add(Start);
 
         for (char c : input.toCharArray()) {
             // Create a new array for the set of states that this input symbol will transition the current states to.
-            ArrayList<SpecializedState> nextStates = new ArrayList<SpecializedState>();
+            ArrayList<State> nextStates = new ArrayList<State>();
 
             // For each current state we take its transition.
-            for (SpecializedState s : currentStates) {
-                SpecializedState next = s.Next(c);
+            for (State s : currentStates) {
+                State next = s.Next(c);
 
                 // If it's not null then there is a matching transition. We only add distinct states
                 // because we're mimicking a mathematical set object.

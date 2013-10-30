@@ -17,16 +17,16 @@ public class ParserHelper {
         throw new IllegalArgumentException("The input string is missing a parenthesis.");
     }
 
-    public static String StringBeforeSameLevelUnion(String input, int start) {
-        int parenCount = 0;
+    public static String StringBeforeSameLevelUnion(String input) {
+        int parenthesesCount = 0;
         for (int i = 0; i < input.length(); i++) {
-            if (input.charAt(i) == '(') parenCount++;
-            if (input.charAt(i) == ')') parenCount--;
+            if (input.charAt(i) == '(') parenthesesCount++;
+            if (input.charAt(i) == ')') parenthesesCount--;
 
-            if (parenCount == 0 && input.charAt(i) == '|') return input.substring(start, i);
+            if (parenthesesCount == 0 && input.charAt(i) == '|') return input.substring(0, i);
         }
 
-        // This function returns the rest of the string if there are no more unions.
-        return input.substring(start);
+        // This function returns the whole string if there are no unions.
+        return input;
     }
 }
