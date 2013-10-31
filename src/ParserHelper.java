@@ -5,7 +5,7 @@ public class ParserHelper {
             if (input.charAt(i) == '(') parenthesesCount++;
             if (input.charAt(i) == ')') parenthesesCount--;
 
-            if (parenthesesCount == 0) return input.substring(0, i);
+            if (parenthesesCount == 0) return input.substring(0, i + 1);
         }
 
         // No matching parentheses.

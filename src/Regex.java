@@ -17,8 +17,6 @@ public class Regex {
     }
 
     public static RegexNfa Star(RegexNfa nfa) {
-        // Transition nfa final to start and change final to start
-
         nfa.Final.EpsilonTransitions.add(nfa.Start);
         nfa.Final = nfa.Start;
 
@@ -56,23 +54,33 @@ public class Regex {
 
         String leftUnion = ParserHelper.StringBeforeSameLevelUnion(regex);
         if (leftUnion.length() != regex.length()) {
-            return Union(Regex(leftUnion), Regex(regex.substring(regex.length() - 1)));
+            String rightUnion = regex.substring(leftUnion.length() + 1);
+            return Union(Regex(leftUnion), Regex(rightUnion));
         }
 
         // String is of the form "ab(..(...).)a*(...)*bb..."
-        // IE, no unions to worry about. Next we concatenate the first term with the second term.
+        // IE, no unions to worry about.
+
+        if (regex.length() > 1 && regex.charAt(1) == '*') {
+            RegexNfa left = Star(Regex(regex.substring(0, 1)));
+            if (regex.length() == 2) return left;
+            RegexNfa right = Regex(regex.substring(2));
+            return Concatenate(left, right);
+        }
 
         if (regex.charAt(0) != '(') {
             return Concatenate(Regex(regex.substring(0, 1)), Regex(regex.substring(1)));
         }
 
         String group = ParserHelper.MatchParentheses(regex);
-        if (regex.length() > group.length() && regex.charAt(group.length() + 1) == '*') {
+        if (regex.length() > group.length() && regex.charAt(group.length()) == '*') {
             RegexNfa left = Star(Regex(group.substring(1, group.length() - 1)));
-            RegexNfa right = Regex(regex.substring(group.length() + 2));
+            if (regex.length() == group.length() + 1) return left;
+            RegexNfa right = Regex(regex.substring(group.length() + 1));
             return Concatenate(left, right);
         } else {
-            RegexNfa left = Regex(group.substring(1, group.length() - 1));
+            RegexNfa left = Regex(regex.substring(1, regex.length() - 1));
+            if (regex.length() == group.length() + 2) return left;
             RegexNfa right = Regex(regex.substring((group.length() + 1)));
             return Concatenate(left, right);
         }

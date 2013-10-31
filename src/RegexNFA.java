@@ -1,4 +1,5 @@
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RegexNfa {
     public State Start;
@@ -9,29 +10,24 @@ public class RegexNfa {
         Final = finalState;
     }
 
-    // TODO: Handle epsilon transitions.
     public boolean Accept(String input) {
-        // Handle empty string (e).
-        if (input.equals("e")) return Start == Final;
+        input = input.replace("e", "");
 
-        ArrayList<State> currentStates = new ArrayList<State>();
+        Set<State> currentStates = new HashSet<State>();
         currentStates.add(Start);
+        currentStates.addAll(Start.EpsilonClosure());
 
         for (char c : input.toCharArray()) {
             // Create a new array for the set of states that this input symbol will transition the current states to.
-            ArrayList<State> nextStates = new ArrayList<State>();
+            Set<State> nextStates = new HashSet<State>();
 
             // For each current state we take its transition.
             for (State s : currentStates) {
-                State next = s.Next(c);
-
-                // If it's not null then there is a matching transition. We only add distinct states
-                // because we're mimicking a mathematical set object.
-                if (next != null && !nextStates.contains(next)) {
-                    nextStates.add(next);
-                }
+                nextStates.addAll(s.Next(c));
             }
-            currentStates = nextStates;
+            // Remove current states and add the new states.
+            currentStates.clear();
+            currentStates.addAll(nextStates);
         }
 
         return currentStates.contains(Final);

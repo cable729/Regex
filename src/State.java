@@ -10,7 +10,7 @@ public class State {
         EpsilonTransitions = new HashSet<State>();
     }
 
-    private Set<State> EpsilonClosure() {
+    public Set<State> EpsilonClosure() {
         Set<State> closure = new HashSet<State>(EpsilonTransitions);
 
         for (State s : EpsilonTransitions) {
@@ -21,10 +21,19 @@ public class State {
     }
 
     public Set<State> Next(char input) {
-        Set<State> nextStates = EpsilonClosure();
+        Set<State> nextStates = new HashSet<State>();
+        if (TransitionA != null && TransitionB != null) {
+            nextStates.addAll(EpsilonClosure());
+        }
 
-        if (input == 'a') nextStates.add(TransitionA);
-        if (input == 'b') nextStates.add(TransitionB);
+        if (input == 'a' && TransitionA != null) {
+            nextStates.add(TransitionA);
+            nextStates.addAll(TransitionA.EpsilonClosure());
+        }
+        if (input == 'b' && TransitionB != null) {
+            nextStates.add(TransitionB);
+            nextStates.addAll(TransitionB.EpsilonClosure());
+        }
 
         return nextStates;
     }
